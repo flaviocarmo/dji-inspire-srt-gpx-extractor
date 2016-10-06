@@ -18,7 +18,7 @@ process.stdin.on('readable', () => {
 process.stdin.on('end', () => {
   const data = parser.fromSrt(srt);
 
-  const re = /\}A,(\d+),(\d+\.\d+),([+-]?\d\d)(\d+\.\d+),(N),([+-]?\d\d\d)(\d+\.\d+),(E),([+-]?\d+.\d+),([+-]?\d+\.\d+),([+-]?\d+\.\d+),([+-]?\d+\.\d+);/;
+  const re = /\GPS\([-]?[0-9]{1,3}\.[0-9]{3,}\,[-]?[0-9]{1,3}\.[0-9]{3,},?[0-9]{1,2}\)/;
 
   const gpx = builder.create('gpx').att({xmlns: 'http://www.topografix.com/GPX/1/1', version: '1.1'});
 
@@ -26,15 +26,23 @@ process.stdin.on('end', () => {
   const trkseg = trk.ele('trkseg');
 
   data.forEach(item => {
-      const m = re.exec(item.text);
+
+      const rows = item.text.split("\n");
+
+      const time = rows[0].split(") ")[1];
+
+      const m = re.exec(rows[1]);
       if (m) {
           const trkpt = trkseg.ele('trkpt');
+          
+          const parts = JSON.parse(m[0].replace("GPS(","[").replace(")","]"));
+
           trkpt.att({
-              lat: (m[5] === 'N' ? 1 : -1) * (parseFloat(m[3]) + parseFloat(m[4]) / 60),
-              lon: (m[8] === 'E' ? 1 : -1) * (parseFloat(m[6]) + parseFloat(m[7]) / 60)
+              lat: parts[1],
+              lon: parts[0]
           });
-          trkpt.ele('time', moment(m[1] + m[2], 'YYMMDDHHmmss.SSS').format());
-          trkpt.ele('speed', parseFloat(m[9]) * 1.60934);
+          trkpt.ele('time', moment(time, 'YYYY.MM.DD HH:mm:ss').format());
+          //trkpt.ele('speed', parseFloat(m[9]) * 1.60934);
       } else {
           console.error(item.text);
       }
