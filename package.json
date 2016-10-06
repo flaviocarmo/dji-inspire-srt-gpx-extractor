@@ -1,12 +1,12 @@
 {
-  "name": "truecam-srt-gpx-extractor",
-  "version": "0.0.1",
-  "description": "Creates GPX from TrueCam video subtitles",
+  "name": "dji-inspire-srt-gpx-extractor",
+  "version": "0.0.2",
+  "description": "Creates GPX from DJI Inspire video subtitles",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Martin Ždila",
+  "author": "Flavio Carmo",
   "license": "BSD",
   "dependencies": {
     "moment": "^2.13.0",
